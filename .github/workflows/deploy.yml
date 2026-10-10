@@ -1,0 +1,37 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.7.2
+  EXPORT_NAME: TPS_DEMO
+#  ITCH_USERNAME: ${{ secrets.ITCH_USERNAME }}
+#  ITCH_GAME: ${{ secrets.ITCH_GAME }}
+
+jobs:
+  build:
+    name: Export and deploy to itch.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: "4.7.2"
+          use-dotnet: false
+          include-templates: true
+
+
+      - name: Export Windows executable
+        run: |
+          mkdir -pv build/windows
+          godot --headless --export-release "Windows Desktop" build/windows/${{ env.EXPORT_NAME }}.exe
+
