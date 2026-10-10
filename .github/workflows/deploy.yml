@@ -9,8 +9,8 @@ on:
 env:
   GODOT_VERSION: 4.7.2
   EXPORT_NAME: TPS_DEMO
-#  ITCH_USERNAME: ${{ secrets.ITCH_USERNAME }}
-#  ITCH_GAME: ${{ secrets.ITCH_GAME }}
+  ITCH_USERNAME: ${{ secrets.ITCH_USERNAME }}
+  ITCH_GAME: ${{ secrets.ITCH_GAME }}
 
 jobs:
   build:
@@ -35,3 +35,15 @@ jobs:
           mkdir -pv build/windows
           godot --headless --export-release "Windows Desktop" build/windows/${{ env.EXPORT_NAME }}.exe
 
+      - name: Install butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Deploy to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          ./butler push build/windows ${{ env.ITCH_USERNAME }}/${{ env.ITCH_GAME }}:windows --userversion "${{ github.run_number }}"
