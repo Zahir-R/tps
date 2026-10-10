@@ -35,12 +35,14 @@ jobs:
           mkdir -pv build/windows
           godot --headless --export-release "Windows Desktop" build/windows/${{ env.EXPORT_NAME }}.exe
 
-      - name: Install butler
-        run: |
-          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-          unzip butler.zip
-          chmod +x butler
-          ./butler -V
+      - name: deploy
+        uses: yeslayla/butler-publish-itchio-action@master
+        env:
+            BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
+            CHANNEL: windows
+            ITCH_GAME: example-project
+            ITCH_USER: username
+            PACKAGE: build/windows
 
       - name: Deploy to itch.io
         env:
